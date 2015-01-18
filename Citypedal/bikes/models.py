@@ -29,7 +29,8 @@ class UserManager(BaseUserManager):
 
     def create_superuser(self, username, email, password, **extra_fields):
         user = self._create_user(username, email, password,
-                                 self.model.LEVEL_ADMIN, **extra_fields)
+                                 self.model.LEVEL_ADMIN,
+                                 is_superuser=True, **extra_fields)
         user.save(using=self._db)
         return user
 
@@ -42,7 +43,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     joined_at = models.DateTimeField(auto_now_add=True)
     balance = models.DecimalField(max_digits=7, decimal_places=2,
-                                  default=Decimal(0))
+                                  default=Decimal('0.00'))
 
     LEVEL_USER = 1
     LEVEL_SERVICE = 3
@@ -61,6 +62,13 @@ class User(AbstractBaseUser, PermissionsMixin):
     REQUIRED_FIELDS = ['first_name', 'last_name', 'email']
 
     objects = UserManager()
+
+    @property
+    def is_staff(self):
+        return self.level >= User.LEVEL_SUPPORT
+
+    def get_short_name(self):
+        return self.username
 
 
 class Transaction(models.Model):
