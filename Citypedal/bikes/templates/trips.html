@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<table class="table">
+<tr>
+	<th>Data</th>
+	<th>Czas trwania</th>
+	<th>Ze stacji</th>
+	<th>Do stacji</th>
+</tr>
+{% for trip in trips %}
+<tr>
+	<td>{{ trip.started_at }}</td>
+	<td>{{ trip.duration }}</td>
+	<td>{{ trip.from_station }}</td>
+	<td>{{ trip.to_station|default_if_none:"-" }}</td>
+</tr>
+{% empty %}
+<tr>
+	<td colspan="4">Brak podróży do wyświetlenia.</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

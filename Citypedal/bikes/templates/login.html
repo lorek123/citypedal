@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="author" content="CityPedal Development Team">
+		<title>CityPedal</title>
+		<link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/login.css" rel="stylesheet">
+	</head>
+
+	<body>
+		<div class="container">			
+			<form class="form-signin" action="{% url 'login' %}" method="post">{% csrf_token %}
+				{% for error in form.non_field_errors %}
+				<div class="alert alert-danger">
+					<button class="close" data-dismiss="alert">×</button>
+					{{ error }}
+				</div>
+				{% endfor %}
+				<h2 class="form-signin-heading">CityPedal</h2>
+				<input type="text" class="form-control" placeholder="Username" id="id_username" name="username" autofocus>
+				<input type="password" class="form-control" placeholder="Password" id="id_password" name="password">
+				<button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
+			</form>
+
+		</div> <!-- /container -->
+	</body>
+</html>
