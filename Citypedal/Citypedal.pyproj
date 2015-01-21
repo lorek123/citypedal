@@ -40,6 +40,9 @@
   <ItemGroup>
     <Content Include="bikes\templates\base.html" />
     <Content Include="bikes\templates\home.html" />
+    <Content Include="bikes\templates\login.html" />
+    <Content Include="bikes\templates\register.html" />
+    <Content Include="bikes\templates\trips.html" />
     <Content Include="requirements.txt" />
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+﻿    # -*- coding: utf-8 -*-
 from datetime import datetime
 from decimal import Decimal
 from django.conf import settings
@@ -106,11 +106,22 @@ class Bike(models.Model):
     station = models.ForeignKey('Station', related_name="bikes",
                                 null=True, blank=True)
 
+    def save(self):
+        if self.station:
+            self.state = Bike.STATE_BORROWED
+        elif self.state != Bike.STATE_SERVICED:
+            self.state = Bike.STATE_AVAILABLE
+        super().save()
+
 
 class Station(models.Model):
+    name = models.CharField(max_length=255)
     latitude = models.FloatField()
     longitude = models.FloatField()
     is_active = models.BooleanField(default=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Service(models.Model):
@@ -135,7 +146,7 @@ class Trip(models.Model):
     @property
     def duration(self):
         if self.ended_at is None:
-            raise ValueError
+            raise ValueError("Trip has not ended yet")
         return self.ended_at - self.started_at
 
     @property
@@ -143,10 +154,15 @@ class Trip(models.Model):
         # losowo ustalona cena za pomocą rzutu kostką
         return Decimal(4)
 
-    def save(self):
-        if self.to_station and self.ended_at is None:
-            self.ended_at = datetime.now()
-        super().save()
+    def save(self, *args, **kwargs):
+        if self.to_station:
+            self.bike.station = self.to_station
+            if self.ended_at is None:
+                self.ended_at = datetime.now()
+        else:
+            self.bike.station = None
+        self.bike.save()
+        super().save(*args, **kwargs)
         Transaction.objects.create(user=self.user,
                                    amount=self.price,
                                    trip=self, type=Transaction.TYPE_TRIP)

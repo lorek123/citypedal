@@ -1,9 +1,11 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.core.urlresolvers import reverse
 from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
+from bikes.models import Station, Trip
 from bikes.forms import RegisterForm
 
 
@@ -13,6 +15,34 @@ def home(request, **kwargs):
 def trips(request):
     return render(request, 'trips.html', {
         'trips': request.user.trips.all()
+    })
+
+@login_required
+def trip_new(request):
+    if request.method == 'POST':
+        try:
+            station_id = int(request.POST.get('station_id'))
+            station = Station.objects.get(pk=station_id)
+            bike = station.bikes.first()
+        except (TypeError, ValueError):
+            messages.error(request, "Nieprawidłowy numer stacji")
+        except Station.DoesNotExist:
+            messages.error(request, "Wybrana stacja nie istnieje")
+        except Bike.DoesNotExist:
+            messages.error(request, "Brak wolnych rowerów na stacji")
+        else:
+            messages.success(request, "Pomyślnie wypożyczyłeś rower #{}.".format(bike.id))
+            trip = Trip.objects.create(from_station=station, bike=bike, user=request.user)
+            return redirect('trip-details', trip_id=trip.id)
+    return render(request, 'trip-new.html', {
+        'stations': Station.objects.filter(is_active=True).select_related(),
+    })
+
+@login_required
+def trip_details(request, trip_id):
+    trip = get_object_or_404(request.user.trips, pk=trip_id)
+    return render(request, 'trip-details.html', {
+        'trip': trip,
     })
 
 def register(request):

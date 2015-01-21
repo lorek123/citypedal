@@ -1,38 +1,27 @@
 ﻿{% extends 'base.html' %}
 {% block content %}
-                    <div class="jumbotron">
-                        <h1>Witaj, miejski pedale.</h1>
-                        <p>To jest strona dla Ciebie!</p>
-                    </div>
+<div class="jumbotron">
+    {% if user.is_authenticated %}
+    <h1>Witaj,  {{ user.first_name }}!</h1>
+    {% else %}
+    <h1>Witaj,  Podróżniku!</h1>
+    {% endif %}
+    <p>Zapraszamy do podróży z nami!</p>
+</div>
                     <div class="row">
                         <div class="col-xs-6 col-lg-4">
-                            <h2>Heading</h2>
-                            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+                            <h2>O nas</h2>
+                            <p>City Pedal to nowoczesny system wypożyczalni rowerów miejskich, z wieloma stacjami w Twoim mieście!</p>
                             <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
                         </div><!--/.col-xs-6.col-lg-4-->
                         <div class="col-xs-6 col-lg-4">
-                            <h2>Heading</h2>
-                            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+                            <h2>Rowery</h2>
+                            <p>W naszym posiadaniu są najnowocześniejsze rowery. Ponadto dokładamy wszelkich starań by utrzymać je zawsze w jak najlepszym stanie! </p>
                             <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
                         </div><!--/.col-xs-6.col-lg-4-->
                         <div class="col-xs-6 col-lg-4">
-                            <h2>Heading</h2>
-                            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                            <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-                        </div><!--/.col-xs-6.col-lg-4-->
-                        <div class="col-xs-6 col-lg-4">
-                            <h2>Heading</h2>
-                            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                            <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-                        </div><!--/.col-xs-6.col-lg-4-->
-                        <div class="col-xs-6 col-lg-4">
-                            <h2>Heading</h2>
-                            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-                            <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
-                        </div><!--/.col-xs-6.col-lg-4-->
-                        <div class="col-xs-6 col-lg-4">
-                            <h2>Heading</h2>
-                            <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+                            <h2>Nowoczesny system</h2>
+                            <p>Naszym głównym celem jest dostarczenie nowoczesnego systemu wypożyczalni rowerów miejskich. Dzięki najnowszym technologiom oraz specjalistom jesteśmy w ścisłej czołówce w Polsce w tego typu rozwiazaniach!</p>
                             <p><a class="btn btn-default" href="#" role="button">View details &raquo;</a></p>
                         </div><!--/.col-xs-6.col-lg-4-->
                     </div><!--/row-->

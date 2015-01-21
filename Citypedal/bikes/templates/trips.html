@@ -10,7 +10,7 @@
 {% for trip in trips %}
 <tr>
 	<td>{{ trip.started_at }}</td>
-	<td>{{ trip.duration }}</td>
+	<td>{% if trip.to_station %}{{ trip.duration }}{% else %}-{% endif %}</td>
 	<td>{{ trip.from_station }}</td>
 	<td>{{ trip.to_station|default_if_none:"-" }}</td>
 </tr>
