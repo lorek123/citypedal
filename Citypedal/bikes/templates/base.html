@@ -16,6 +16,7 @@
 
         <!-- Custom styles for this template -->
         <link href="{{ STATIC_URL }}css/offcanvas.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/karolstrasburger.css" rel="stylesheet">
 
         <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
         <!--[if lt IE 9]><script src="{{ STATIC_URL }}js/ie8-responsive-file-warning.js"></script><![endif]-->
@@ -43,8 +44,7 @@
                 <div id="navbar" class="collapse navbar-collapse">
                     <ul class="nav navbar-nav">
                         <li class="active"><a href="{% url 'home' %}">Home</a></li>
-                        <li><a href="#about">About</a></li>
-                        <li><a href="#contact">Contact</a></li>
+                        {# <li><a href="{% url 'contact' %}">Kontakt</a></li> #}
                     </ul>
                     <ul class="nav navbar-nav navbar-right">
                     {% if user.is_authenticated %}
@@ -59,13 +59,18 @@
         </nav><!-- /.navbar -->
 
         <div class="container">
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+            {% if messages|length %}
+            <div class="row-fluid">
+                <div class="span8 offset2" id="messages">
+                {% for message in messages %}
+                    <div {% if message.tags %} class="alert alert-{{ message.tags }}"{% endif %}>
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        {{ message|safe }}
+                    </div>
+                {% endfor %}
+                </div>
+            </div>
+            {% endif %}
             <div class="row row-offcanvas row-offcanvas-right">
 
                 <div class="col-xs-12 col-sm-9">
@@ -76,23 +81,17 @@
                 </div><!--/.col-xs-12.col-sm-9-->
 
                 <div class="col-xs-6 col-sm-3 sidebar-offcanvas" id="sidebar">
-                    <div class="list-group">
                     {% if user.is_authenticated %}
+                    <div class="list-group">
                         <span class="list-group-item active">
                             <h4 class="list-group-item-heading">Stan konta: {{ user.balance|floatformat:2 }} PLN</h4>
                             <p class="list-group-item-text">{{ user }}</p>
                         </span>
-                        {% if user.current_trip %}
-                        <span class="list-group-item">Podróżujesz od {{ user.current_trip.duration }} minut ze stacji {{ user.current_trip.from_station }}</span>
-                        {% endif %}
                         <a href="{% url 'trip-new' %}" class="list-group-item list-group-item-success">Wypożycz rower</a>
                         <a href="{% url 'trips' %}" class="list-group-item">Historia podróży</a>
-                    {% else %}
-                        <span class="list-group-item">
-
-                        </span>
-                    {% endif %}
+                        <a href="{% url 'transactions' %}" class="list-group-item">Historia transakcji</a>
                     </div>
+                    {% endif %}
                 </div><!--/.sidebar-offcanvas-->
             </div><!--/row-->
 

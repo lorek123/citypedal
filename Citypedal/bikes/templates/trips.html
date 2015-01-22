@@ -6,6 +6,7 @@
 	<th>Czas trwania</th>
 	<th>Ze stacji</th>
 	<th>Do stacji</th>
+	<th>Akcje</th>
 </tr>
 {% for trip in trips %}
 <tr>
@@ -13,6 +14,7 @@
 	<td>{% if trip.to_station %}{{ trip.duration }}{% else %}-{% endif %}</td>
 	<td>{{ trip.from_station }}</td>
 	<td>{{ trip.to_station|default_if_none:"-" }}</td>
+	<td>{% if not trip.is_completed %}<a class="btn btn-xs btn-default" href="{% url 'trip-finish' trip.id %}">Zwróć</a>{% endif %}</td>
 </tr>
 {% empty %}
 <tr>

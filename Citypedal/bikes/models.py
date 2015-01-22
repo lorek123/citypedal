@@ -1,5 +1,4 @@
-﻿    # -*- coding: utf-8 -*-
-from datetime import datetime
+﻿# -*- coding: utf-8 -*-
 from decimal import Decimal
 from django.conf import settings
 from django.db import models
@@ -63,6 +62,10 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     objects = UserManager()
 
+    def topup(self, amount):
+        Transaction.objects.create(user=self, amount=amount,
+                                   type=Transaction.TYPE_TOPUP)
+
     @property
     def is_staff(self):
         return self.level >= User.LEVEL_SUPPORT
@@ -76,6 +79,7 @@ class Transaction(models.Model):
                              related_name="transactions")
     amount = models.DecimalField(max_digits=7, decimal_places=2)
     trip = models.ForeignKey("Trip", null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     TYPE_TOPUP = "T"
     TYPE_TRIP = "R"
@@ -85,11 +89,16 @@ class Transaction(models.Model):
     TYPE_CHOICES = (
         (TYPE_TOPUP, "Wpłata"),
         (TYPE_TRIP, "Podróż"),
-        (TYPE_CHAN, "Kara"),
+        (TYPE_CHAN, "Kara"),  # #pdk
         (TYPE_REFUND, "Zwrot"),
         (TYPE_PROMOTION, "Promocja"),
     )
     type = models.CharField(max_length=1, choices=TYPE_CHOICES)
+
+    def save(self, **kwargs):
+        self.user.balance += self.amount
+        self.user.save()
+        super().save(**kwargs)
 
 
 class Bike(models.Model):
@@ -106,12 +115,16 @@ class Bike(models.Model):
     station = models.ForeignKey('Station', related_name="bikes",
                                 null=True, blank=True)
 
-    def save(self):
-        if self.station:
+    def __str__(self):
+        return "Bike #{}, {}, {}".format(self.id, self.get_state_display(),
+                                         self.station)
+
+    def save(self, **kwargs):
+        if not self.station:
             self.state = Bike.STATE_BORROWED
-        elif self.state != Bike.STATE_SERVICED:
+        elif self.state == Bike.STATE_BORROWED:
             self.state = Bike.STATE_AVAILABLE
-        super().save()
+        super().save(**kwargs)
 
 
 class Station(models.Model):
@@ -130,6 +143,11 @@ class Service(models.Model):
     description = models.TextField()
 
 
+# class Contact(models.Model):
+#     message = models.TextField()
+#     type = models.BooleanField()
+
+
 class Trip(models.Model):
     from_station = models.ForeignKey(Station, related_name="beginning_trips")
     to_station = models.ForeignKey(Station, related_name="ending_trips",
@@ -141,28 +159,27 @@ class Trip(models.Model):
 
     @property
     def is_completed(self):
-        return self.to_station is None
+        return self.to_station is not None
 
     @property
     def duration(self):
         if self.ended_at is None:
-            raise ValueError("Trip has not ended yet")
+            raise ValueError
         return self.ended_at - self.started_at
 
     @property
     def price(self):
-        # losowo ustalona cena za pomocą rzutu kostką
-        return Decimal(4)
+        AMOUNT_PER_HOUR = Decimal('2.00')
+        ended_at = self.ended_at or timezone.now()
+        hours = (ended_at - self.started_at).total_seconds()/3600
+        return round(AMOUNT_PER_HOUR * Decimal(hours), 2)
 
-    def save(self, *args, **kwargs):
-        if self.to_station:
+    def save(self, **kwargs):
+        if self.to_station and self.ended_at is None:
+            self.ended_at = timezone.now()
+            Transaction.objects.create(user=self.user,
+                                       amount=-self.price,
+                                       trip=self, type=Transaction.TYPE_TRIP)
             self.bike.station = self.to_station
-            if self.ended_at is None:
-                self.ended_at = datetime.now()
-        else:
-            self.bike.station = None
-        self.bike.save()
-        super().save(*args, **kwargs)
-        Transaction.objects.create(user=self.user,
-                                   amount=self.price,
-                                   trip=self, type=Transaction.TYPE_TRIP)
+            self.bike.save()
+        super().save(**kwargs)

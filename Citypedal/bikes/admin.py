@@ -1,5 +1,5 @@
 from django.contrib import admin
-from bikes.models import *
+from bikes.models import User, Transaction, Bike, Station, Trip
 
 
 class UserAdmin(admin.ModelAdmin):

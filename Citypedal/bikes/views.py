@@ -1,24 +1,36 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.urlresolvers import reverse
-from django.contrib.auth import get_user_model
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
-from bikes.models import Station, Trip
+from django.contrib.auth.forms import AuthenticationForm
+from bikes.models import Bike, Station, Trip
 from bikes.forms import RegisterForm
 
 
 def home(request, **kwargs):
     return render(request, 'home.html', {})
 
+
+def transactions(request):
+    return render(request, 'transactions.html', {
+        'transactions': request.user.transactions.order_by('-created_at',
+                                                           '-id')
+    })
+
+
 def trips(request):
     return render(request, 'trips.html', {
-        'trips': request.user.trips.all()
+        'trips': request.user.trips.order_by('-started_at')
     })
+
 
 @login_required
 def trip_new(request):
+    if request.user.balance <= 0:
+        messages.error(request,
+                       'Masz zbyt mało środków, aby wypożyczyć rower.')
+        return redirect(reverse('home'))
     if request.method == 'POST':
         try:
             station_id = int(request.POST.get('station_id'))
@@ -31,12 +43,16 @@ def trip_new(request):
         except Bike.DoesNotExist:
             messages.error(request, "Brak wolnych rowerów na stacji")
         else:
-            messages.success(request, "Pomyślnie wypożyczyłeś rower #{}.".format(bike.id))
-            trip = Trip.objects.create(from_station=station, bike=bike, user=request.user)
+            messages.success(request,
+                             "Pomyślnie wypożyczyłeś rower #{}."
+                             .format(bike.id))
+            trip = Trip.objects.create(from_station=station, bike=bike,
+                                       user=request.user)
             return redirect('trip-details', trip_id=trip.id)
     return render(request, 'trip-new.html', {
         'stations': Station.objects.filter(is_active=True).select_related(),
     })
+
 
 @login_required
 def trip_details(request, trip_id):
@@ -44,6 +60,31 @@ def trip_details(request, trip_id):
     return render(request, 'trip-details.html', {
         'trip': trip,
     })
+
+
+@login_required
+def trip_finish(request, trip_id):
+    trip = get_object_or_404(request.user.trips, pk=trip_id)
+    if request.method == 'POST':
+        try:
+            station_id = int(request.POST.get('station_id'))
+            station = Station.objects.get(pk=station_id)
+        except (TypeError, ValueError):
+            messages.error(request, "Nieprawidłowy numer stacji")
+        except Station.DoesNotExist:
+            messages.error(request, "Wybrana stacja nie istnieje")
+        trip.to_station = station
+        trip.save()
+        messages.success(request,
+                         "Pomyślnie zwróciłeś rower. Zapłaciłeś {} PLN."
+                         .format(trip.price))
+        return redirect('trip-details', trip_id=trip.id)
+
+    return render(request, 'trip-finish.html', {
+        'trip': trip,
+        'stations': Station.objects.filter(is_active=True).select_related(),
+    })
+
 
 def register(request):
     if request.user.is_authenticated():
@@ -66,6 +107,7 @@ def register(request):
         'register_form': register_form,
     })
 
+
 def login_view(request):
     if request.user.is_authenticated():
         return redirect(reverse('home'))
@@ -78,6 +120,7 @@ def login_view(request):
     return render(request, 'login.html', {
         'form': form,
     })
+
 
 def logout_view(request):
     logout(request)

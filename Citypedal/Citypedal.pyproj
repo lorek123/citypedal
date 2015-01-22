@@ -39,9 +39,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="bikes\templates\base.html" />
+    <Content Include="bikes\templates\contact.html" />
     <Content Include="bikes\templates\home.html" />
     <Content Include="bikes\templates\login.html" />
     <Content Include="bikes\templates\register.html" />
+    <Content Include="bikes\templates\trip-details.html" />
+    <Content Include="bikes\templates\trip-return.html" />
+    <Content Include="bikes\templates\trip-new.html" />
     <Content Include="bikes\templates\trips.html" />
     <Content Include="requirements.txt" />
   </ItemGroup>
