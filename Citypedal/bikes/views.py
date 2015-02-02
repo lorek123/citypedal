@@ -1,11 +1,15 @@
+import uuid
+from django.conf import settings
 from django.shortcuts import get_object_or_404, render, redirect
 from django.core.urlresolvers import reverse
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import AuthenticationForm
-from bikes.models import Bike, Station, Trip
-from bikes.forms import RegisterForm
+from django.contrib.contenttypes.models import ContentType
+from paypal.standard.forms import PayPalPaymentsForm
+from bikes.models import Bike, Station, Trip, Ticket
+from bikes.forms import RegisterForm, DisputeForm
 
 
 def home(request, **kwargs):
@@ -84,6 +88,99 @@ def trip_finish(request, trip_id):
         'trip': trip,
         'stations': Station.objects.filter(is_active=True).select_related(),
     })
+
+
+@login_required
+def topup(request):
+    paypal_dict = {
+        "business": settings.PAYPAL_RECEIVER_EMAIL,
+        "amount": "10.00",
+        "item_name": "Doładowanie konta",
+        "invoice": uuid.uuid4(),
+        "notify_url": "https://citypedal.cloudapp.net" + reverse('paypal-ipn'),
+        "return_url": "https://citypedal.cloudapp.net/",
+        "cancel_return": "https://citypedal.cloudapp.net/",
+
+    }
+
+    return render(request, 'topup.html', {
+        'form': PayPalPaymentsForm(initial=paypal_dict)
+    })
+
+
+@login_required
+def dispute(request, trip_id):
+    trip = get_object_or_404(request.user.trips, pk=trip_id)
+    if Ticket.objects.filter(
+        content_type=ContentType.objects.get_for_model(trip),
+        object_id=trip.pk
+    ).exists():
+        messages.warning(request, "Ticket dla tej podróży już istnieje")
+        return redirect(reverse('home'))
+    form = DisputeForm()
+    if request.method == 'POST':
+        form = DisputeForm(request.POST)
+        if form.is_valid():
+            ticket = Ticket.objects.create(
+                    content_type=ContentType.objects.get_for_model(trip),
+                    object_id=trip.pk,
+                    user=request.user,
+                    description=form.cleaned_data['description']
+                )
+            messages.success(request, "Założono ticket.")
+            return redirect(reverse('ticket-details', args=[str(ticket.id)]))
+    return render(request, 'dispute.html', {
+        'form': form
+    })
+
+
+@login_required
+def ticket_details(request, ticket_id):
+    tickets = Ticket if request.user.is_staff else request.user.tickets
+    ticket = get_object_or_404(tickets, pk=ticket_id)
+    return render(request, 'ticket-details.html', {
+        'ticket': ticket,
+    })
+
+
+@login_required
+def ticket_reject(request, ticket_id):
+    if not request.user.is_staff:
+        return redirect(reverse('home'))
+    ticket = get_object_or_404(Ticket.objects.filter(resolved_at__isnull=True),
+                               pk=ticket_id)
+    ticket.resolve()
+    ticket.save()
+    messages.success(request, "Odrzucono ticket")
+    return redirect(ticket.get_absolute_url())
+
+
+@login_required
+def ticket_refund(request, ticket_id):
+    if not request.user.is_staff:
+        return redirect(reverse('home'))
+    ticket = get_object_or_404(Ticket.objects.filter(resolved_at__isnull=True),
+                               pk=ticket_id)
+    ticket.resolve(refund=True)
+    ticket.save()
+    messages.success(request, "Uznano ticket")
+    return redirect(ticket.get_absolute_url())
+
+
+@login_required
+def tickets(request):
+    return render(request, 'tickets.html', {
+        'tickets': request.user.tickets.order_by('-resolved_at', '-id')
+        })
+
+
+@login_required
+def tickets_admin(request):
+    if not request.user.is_staff:
+        return redirect(reverse('home'))
+    return render(request, 'tickets-admin.html', {
+        'tickets': Ticket.objects.filter(resolved_at__isnull=True)
+        })
 
 
 def register(request):

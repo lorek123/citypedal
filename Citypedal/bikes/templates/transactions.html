@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load pagination_tags %}
+{% block content %}
+<table class="table">
+<tr>
+	<th>Data</th>
+	<th>Typ</th>
+	<th>Kwota</th>
+</tr>
+{% autopaginate transactions %}
+{% paginate %}
+{% for transaction in transactions %}
+<tr>
+	<td>{{ transaction.created_at }}</td>
+	<td>{{ transaction.get_type_display }}</td>
+	<td>{{ transaction.amount|floatformat:2 }}</td>
+</tr>
+{% empty %}
+<tr>
+	<td colspan="3">Brak transakcji do wyświetlenia.</td>
+</tr>
+{% endfor %}
+</table>
+{% paginate %}
+{% endblock %}

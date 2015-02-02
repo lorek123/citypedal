@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block content %}
+<table class="table">
+<tr>
+	<th>Typ</th>
+	<th>Użytkownik</th>
+	<th>Czas utworzenia</th>
+	<th>Czas zakonczenia</th>
+	<th>Akcje</th>
+</tr>
+{% for ticket in tickets %}
+<tr>
+	<td>{{ ticket.content_object }}</td>
+	<td>{{ ticket.user }}</td>
+	<td>{{ ticket.created_at }}</td>
+	<td>{{ ticket.resolved_at }}</td>
+	<td><a class="btn btn-xs btn-default" href="{% url 'ticket-details' ticket.id %}">Zobacz</a></td>
+</tr>
+{% empty %}
+<tr>
+	<td colspan="5">Brak ticketów do wyświetlenia.</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

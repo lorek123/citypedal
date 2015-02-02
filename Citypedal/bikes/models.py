@@ -2,9 +2,14 @@
 from decimal import Decimal
 from django.conf import settings
 from django.db import models
+from django.contrib.contenttypes.models import ContentType
+from django.contrib.contenttypes import generic
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.contrib.auth.models import PermissionsMixin
+from django.core.urlresolvers import reverse
 from django.utils import timezone
+from paypal.standard.models import ST_PP_COMPLETED
+from paypal.standard.ipn.signals import valid_ipn_received
 
 
 class UserManager(BaseUserManager):
@@ -143,9 +148,36 @@ class Service(models.Model):
     description = models.TextField()
 
 
-# class Contact(models.Model):
-#     message = models.TextField()
-#     type = models.BooleanField()
+class Ticket(models.Model):
+    limit = models.Q(app_label='bikes', model='transaction') | \
+        models.Q(app_label='bikes', model='bike')
+    content_type = models.ForeignKey(
+        ContentType,
+        limit_choices_to=limit,
+        null=True,
+        blank=True,
+    )
+    object_id = models.PositiveIntegerField(null=True)
+    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, related_name="tickets")
+
+    description = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    resolved_at = models.DateTimeField(null=True, blank=True, editable=False)
+
+    def get_absolute_url(self):
+        return reverse('ticket-details', args=[str(self.id)])
+
+    def is_resolved(self):
+        return self.resolved_at is not None
+    is_resolved.boolean = True
+
+    def resolve(self, refund=False):
+        self.resolved_at = timezone.now()
+        if refund and self.content_type.model == 'trip':
+            Transaction.objects.create(user=self.user,
+                                       amount=self.content_object.price,
+                                       type=Transaction.TYPE_REFUND)
 
 
 class Trip(models.Model):
@@ -174,6 +206,12 @@ class Trip(models.Model):
         hours = (ended_at - self.started_at).total_seconds()/3600
         return round(AMOUNT_PER_HOUR * Decimal(hours), 2)
 
+    def get_absolute_url(self):
+        return reverse('trip-details', args=[str(self.id)])
+
+    def __str__(self):
+        return "Trip #{}".format(self.pk)
+
     def save(self, **kwargs):
         if self.to_station and self.ended_at is None:
             self.ended_at = timezone.now()
@@ -183,3 +221,14 @@ class Trip(models.Model):
             self.bike.station = self.to_station
             self.bike.save()
         super().save(**kwargs)
+
+
+def show_me_the_money(sender, **kwargs):
+    ipn_obj = sender
+    if ipn_obj.payment_status == ST_PP_COMPLETED:
+        Transaction.objects.create(user=User.objects.get(username='test'),
+                                   amount=Decimal('10.00'))
+    else:
+        pass
+
+valid_ipn_received.connect(show_me_the_money)

@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<table class="table">
+<tr>
+	<th>Typ</th>
+	{% if request.user.is_staff %}<th>Użytkownik</th>{% endif %}
+	<th>Czas utworzenia</th>
+	<th>Czas zakonczenia</th>
+
+</tr>
+	<tr>
+	<td>{{ ticket.content_object }}</td>
+	{% if request.user.is_staff %}<td>{{ ticket.user }}</td>{% endif %}
+	<td>{{ ticket.created_at }}</td>
+	<td>{{ ticket.resolved_at }}</td>
+</tr>
+
+</table>
+
+	<p>{{ ticket.description }}</p>
+	{% if request.user.is_staff and not ticket.resolved_at %}<p><a class="btn btn-danger" href="{% url 'ticket-reject' ticket.id %}">Odrzuć</a> <a class="btn btn-success" href="{% url 'ticket-refund' ticket.id %}">Zwróć</a></p>{% endif %}
+{% endblock %}

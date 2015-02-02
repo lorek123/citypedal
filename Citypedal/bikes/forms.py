@@ -49,3 +49,7 @@ class RegisterForm(forms.Form):
             self.cleaned_data.get('password1'),
             first_name=self.cleaned_data.get('first_name'),
             last_name=self.cleaned_data.get('last_name'))
+
+
+class DisputeForm(forms.Form):
+    description = forms.CharField(widget=forms.Textarea)

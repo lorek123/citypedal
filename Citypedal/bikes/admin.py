@@ -1,5 +1,5 @@
 from django.contrib import admin
-from bikes.models import User, Transaction, Bike, Station, Trip
+from bikes.models import User, Transaction, Bike, Station, Trip, Ticket
 
 
 class UserAdmin(admin.ModelAdmin):
@@ -24,8 +24,14 @@ class TripAdmin(admin.ModelAdmin):
                     'started_at', 'ended_at')
 
 
+class TicketAdmin(admin.ModelAdmin):
+    readonly_fields = ('created_at',)
+    list_display = ('id', 'created_at', 'user', 'content_type',
+                    'object_id', 'is_resolved')
+
 admin.site.register(User, UserAdmin)
 admin.site.register(Transaction, TransactionAdmin)
 admin.site.register(Bike, BikeAdmin)
 admin.site.register(Station, StationAdmin)
 admin.site.register(Trip, TripAdmin)
+admin.site.register(Ticket, TicketAdmin)

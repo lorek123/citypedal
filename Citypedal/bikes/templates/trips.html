@@ -14,11 +14,11 @@
 	<td>{% if trip.to_station %}{{ trip.duration }}{% else %}-{% endif %}</td>
 	<td>{{ trip.from_station }}</td>
 	<td>{{ trip.to_station|default_if_none:"-" }}</td>
-	<td>{% if not trip.is_completed %}<a class="btn btn-xs btn-default" href="{% url 'trip-finish' trip.id %}">Zwróć</a>{% endif %}</td>
+	<td><a class="btn btn-xs btn-default" href="{% url 'trip-details' trip.id %}">Szczegóły</a> {% if not trip.is_completed %}<a class="btn btn-xs btn-default" href="{% url 'trip-finish' trip.id %}">Zwróć</a>{% endif %}</td>
 </tr>
 {% empty %}
 <tr>
-	<td colspan="4">Brak podróży do wyświetlenia.</td>
+	<td colspan="5">Brak podróży do wyświetlenia.</td>
 </tr>
 {% endfor %}
 </table>

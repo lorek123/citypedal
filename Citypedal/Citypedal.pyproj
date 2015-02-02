@@ -28,6 +28,9 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="bikes\admin.py" />
+    <Compile Include="bikes\forms.py" />
+    <Compile Include="bikes\middleware.py" />
     <Compile Include="bikes\models.py" />
     <Compile Include="bikes\views.py" />
     <Compile Include="bikes\__init__.py" />
@@ -38,12 +41,35 @@
     <Compile Include="Citypedal\wsgi.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="bikes\static\css\bootstrap-theme.css" />
+    <Content Include="bikes\static\css\bootstrap-theme.css.map" />
+    <Content Include="bikes\static\css\bootstrap-theme.min.css" />
+    <Content Include="bikes\static\css\bootstrap.css" />
+    <Content Include="bikes\static\css\bootstrap.css.map" />
+    <Content Include="bikes\static\css\bootstrap.min.css" />
+    <Content Include="bikes\static\css\karolstrasburger.css" />
+    <Content Include="bikes\static\css\offcanvas.css" />
+    <Content Include="bikes\static\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="bikes\static\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="bikes\static\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="bikes\static\fonts\glyphicons-halflings-regular.woff" />
+    <Content Include="bikes\static\js\bootstrap.js" />
+    <Content Include="bikes\static\js\bootstrap.min.js" />
+    <Content Include="bikes\static\js\npm.js" />
+    <Content Include="bikes\static\js\offcanvas.js" />
     <Content Include="bikes\templates\base.html" />
     <Content Include="bikes\templates\contact.html" />
+    <Content Include="bikes\templates\dispute.html" />
     <Content Include="bikes\templates\home.html" />
     <Content Include="bikes\templates\login.html" />
     <Content Include="bikes\templates\register.html" />
+    <Content Include="bikes\templates\ticket-details.html" />
+    <Content Include="bikes\templates\tickets-admin.html" />
+    <Content Include="bikes\templates\tickets.html" />
+    <Content Include="bikes\templates\topup.html" />
+    <Content Include="bikes\templates\transactions.html" />
     <Content Include="bikes\templates\trip-details.html" />
+    <Content Include="bikes\templates\trip-finish.html" />
     <Content Include="bikes\templates\trip-return.html" />
     <Content Include="bikes\templates\trip-new.html" />
     <Content Include="bikes\templates\trips.html" />
@@ -51,6 +77,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="bikes\" />
+    <Folder Include="bikes\static\" />
+    <Folder Include="bikes\static\css\" />
+    <Folder Include="bikes\static\fonts\" />
+    <Folder Include="bikes\static\js\" />
     <Folder Include="bikes\templates\" />
     <Folder Include="Citypedal\" />
   </ItemGroup>

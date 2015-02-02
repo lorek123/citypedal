@@ -1,8 +1,23 @@
 {% extends 'base.html' %}
 {% block content %}
-{{ trip.id }}
-{{ trip.bike }}
-{{ trip.user }}
-{{ trip.from_station }}
-{{ trip.to_station }}
+<table class="table">
+<tr>
+	<th>ID</th>
+	<th>Rower</th>
+	<th>Czas trwania</th>
+	<th>Ze stacji</th>
+	<th>Do stacji</th>
+	<th>Akcje</th>
+</tr>
+	<tr>
+	<td>{{ trip.id }}</td>
+	<td>{{ trip.bike_id }}</td>
+	<td>{% if trip.to_station %}{{ trip.duration }}{% else %}-{% endif %}</td>
+	<td>{{ trip.from_station }}</td>
+	<td>{{ trip.to_station }}</td>
+	<td>{% if trip.to_station %}<a class="btn btn-xs btn-default" href="{% url 'dispute' trip.id %}">Reklamuj</a>{% endif %}</td>
+</tr>
+
+</table>
+
 {% endblock %}

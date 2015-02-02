@@ -146,6 +146,7 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'crispy_forms',
+    'paypal.standard.ipn',
     'debug_toolbar',
     'linaro_django_pagination',
 )
@@ -182,3 +183,6 @@ LOGGING = {
 # Specify the default test runner.
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+PAYPAL_TEST = True
+PAYPAL_RECEIVER_EMAIL = "city@ped.al"
