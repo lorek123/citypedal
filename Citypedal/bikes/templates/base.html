@@ -51,7 +51,7 @@
                     {% if user.is_authenticated %}
                         <li><a href="{% url 'logout' %}">Wyloguj się</a></li>
                     {% else %}
-                        <li><a href="{% url 'login' %}">Zaloguj się</a></li>
+                        <li><a href="{% url 'two_factor:login' %}">Zaloguj się</a></li>
                         <li><a href="{% url 'register' %}">Zarejestruj się</a></li>
                     {% endif %}
                     </ul>

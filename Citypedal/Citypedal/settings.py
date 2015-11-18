@@ -114,6 +114,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django_otp.middleware.OTPMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'linaro_django_pagination.middleware.PaginationMiddleware',
@@ -121,6 +122,7 @@ MIDDLEWARE_CLASSES = (
     'security.middleware.DoNotTrackMiddleware',
     'security.middleware.ContentNoSniff',
     'security.middleware.XssProtectMiddleware',
+    'bikes.middleware.TwoFARequiredMiddleware',
     # 'bikes.middleware.LoginRequiredMiddleware',
 )
 
@@ -154,6 +156,10 @@ INSTALLED_APPS = (
     'debug_toolbar',
     'linaro_django_pagination',
     'security',
+    'django_otp',
+    'django_otp.plugins.otp_static',
+    'django_otp.plugins.otp_totp',
+    'two_factor',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -197,3 +203,6 @@ XSS_PROTECT = 'on'
 
 PAYPAL_TEST = True
 PAYPAL_RECEIVER_EMAIL = "city@ped.al"
+
+from django.core.urlresolvers import reverse_lazy
+LOGIN_URL = reverse_lazy('two_factor:login')

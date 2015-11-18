@@ -1,5 +1,7 @@
 django
 django-crispy-forms
-django-security
-linaro-django-pagination
+django-formtools
 django-paypal
+django-security
+django-two-factor-auth
+linaro-django-pagination

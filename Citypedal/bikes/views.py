@@ -16,6 +16,7 @@ def home(request, **kwargs):
     return render(request, 'home.html', {})
 
 
+@login_required
 def transactions(request):
     return render(request, 'transactions.html', {
         'transactions': request.user.transactions.order_by('-created_at',
@@ -23,6 +24,7 @@ def transactions(request):
     })
 
 
+@login_required
 def trips(request):
     return render(request, 'trips.html', {
         'trips': request.user.trips.order_by('-started_at')
