@@ -206,3 +206,4 @@ PAYPAL_RECEIVER_EMAIL = "city@ped.al"
 
 from django.core.urlresolvers import reverse_lazy
 LOGIN_URL = reverse_lazy('two_factor:login')
+LOGIN_REDIRECT_URL = reverse_lazy('home')
