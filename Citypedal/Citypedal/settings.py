@@ -117,6 +117,10 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'linaro_django_pagination.middleware.PaginationMiddleware',
+    'security.middleware.BaseMiddleware',
+    'security.middleware.DoNotTrackMiddleware',
+    'security.middleware.ContentNoSniff',
+    'security.middleware.XssProtectMiddleware',
     # 'bikes.middleware.LoginRequiredMiddleware',
 )
 
@@ -149,6 +153,7 @@ INSTALLED_APPS = (
     'paypal.standard.ipn',
     'debug_toolbar',
     'linaro_django_pagination',
+    'security',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -183,6 +188,12 @@ LOGGING = {
 # Specify the default test runner.
 TEST_RUNNER = 'django.test.runner.DiscoverRunner'
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
+SESSION_COOKIE_HTTPONLY = True
+SECURE_BROWSER_XSS_FILTER = True
+
+XSS_PROTECT = 'on'
 
 PAYPAL_TEST = True
 PAYPAL_RECEIVER_EMAIL = "city@ped.al"

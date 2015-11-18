@@ -1,1 +1,5 @@
 django
+django-crispy-forms
+django-security
+linaro-django-pagination
+django-paypal
