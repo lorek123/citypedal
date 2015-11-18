@@ -190,3 +190,6 @@ ModelManifest.xml
 
 # sqlite
 *.db
+
+# python
+__pycache__/
