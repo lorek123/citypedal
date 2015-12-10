@@ -1,17 +1,19 @@
-from os import path
-
+﻿from os import path
 """
 Django settings for Citypedal project.
 """
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 PROJECT_DIR = path.dirname(path.abspath(path.dirname(__file__)))
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
-
+ALLOWED_HOSTS = [
+    'citypedalod.azurewebsites.net',  # Allow domain and subdomains
+]
 MANAGERS = ADMINS
+
 
 DATABASES = {
     'default': {
@@ -69,7 +71,8 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+BASE_DIR = path.dirname(path.dirname(path.abspath(__file__)))
+STATIC_ROOT = path.join(BASE_DIR, 'static').replace('\\', '/') 
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -153,7 +156,6 @@ INSTALLED_APPS = (
     # 'django.contrib.admindocs',
     'crispy_forms',
     'paypal.standard.ipn',
-    'debug_toolbar',
     'linaro_django_pagination',
     'security',
     'django_otp',
@@ -198,9 +200,13 @@ CRISPY_TEMPLATE_PACK = 'bootstrap3'
 SESSION_ENGINE = 'django.contrib.sessions.backends.signed_cookies'
 SESSION_COOKIE_HTTPONLY = True
 SECURE_BROWSER_XSS_FILTER = True
-
 XSS_PROTECT = 'on'
 
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE  = True
+CSRF_COOKIE_SECURE = True
+SECURE_HSTS_SECONDS = 3600
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 PAYPAL_TEST = True
 PAYPAL_RECEIVER_EMAIL = "city@ped.al"
 
